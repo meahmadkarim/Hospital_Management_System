@@ -1,43 +1,35 @@
+# Hospital Management Database
 
-# Hospital Management System (HMS)
+A PostgreSQL coursework project modelling departments, doctors, patients, appointments, admissions, prescriptions and billing. This is a database demonstration, not a production hospital application.
 
-## Overview
+## Run locally
 
-This project is a PostgreSQL-based Hospital Management System designed to manage core hospital operations including patients, doctors, appointments, medical records, admissions, rooms, and billing. The system demonstrates relational database design principles, normalization, and advanced SQL features such as views, triggers, functions, and analytical queries.
+Install PostgreSQL and use an empty local database. From the repository root:
 
-## Features
+```sh
+createdb hospital_demo
+psql -v ON_ERROR_STOP=1 -d hospital_demo -f 01_schema.sql
+psql -v ON_ERROR_STOP=1 -d hospital_demo -f 02_sample_data.sql
+psql -v ON_ERROR_STOP=1 -d hospital_demo -f 03_views_functions_triggers.sql
+psql -v ON_ERROR_STOP=1 -d hospital_demo -f 04_practice_queries.sql
+psql -v ON_ERROR_STOP=1 -d hospital_demo -f tests/billing_view.sql
+```
 
-The system includes patient registration and management, doctor and department management, appointment scheduling, medical records and prescription tracking, room allocation and admission handling, and a complete billing system with detailed bill items. It also includes automation using triggers and reporting using SQL views and queries.
+Add your own `-h`, `-p` and `-U` connection arguments if required. Never run setup against a database containing valuable records. Setup is not a repeatable migration; use a fresh database. The all-in-one script is an alternative, not an additional setup step.
 
-## Database Structure
+## Implemented
 
-The database consists of the following main tables: departments, doctors, patients, rooms, appointments, medical_records, prescriptions, admissions, billing, and bill_items. All tables are connected through properly defined primary and foreign key relationships to ensure data integrity and consistency.
+- Ten related tables with primary keys, foreign keys and selected checks/indexes.
+- Patient profiles, doctor schedules, available rooms, balances and medical-history views.
+- SQL functions for age, availability and bills; triggers for room status and bill totals.
+- Practice queries and existing project report.
 
-## Advanced SQL Features
+The patient profile aggregates appointments and bills independently so multiple appointments cannot multiply bill totals. `tests/billing_view.sql` checks this regression in a transaction that rolls back.
 
-The project includes SQL views for reporting such as patient profiles, doctor schedules, and pending bills. It also includes functions for reusable logic like age calculation, doctor availability checks, and billing calculations. Triggers are implemented to automate tasks such as room status updates and automatic bill calculation. Additionally, complex SQL queries are used for analysis and reporting.
+## Verification and scope
 
-## Technologies Used
+The modular setup and billing regression were run successfully on PostgreSQL 18 during AI-assisted maintenance. The supplied demonstration records are for local coursework only; do not enter or publish real patient information.
 
-PostgreSQL, SQL (DDL, DML, DQL), and pgAdmin are used for the implementation of this project.
+There is no web interface, authentication, permission model or clinical workflow validation. Room allocation and appointment checks are educational examples, not a concurrency-safe hospital scheduling system. The sample data loads before triggers are created, preserving the original demonstration values. Bill items are not automatically reconciled with billing subtotals.
 
-## Sample Data
-
-The system includes realistic sample data consisting of 20 patients, 10 doctors, multiple appointments and admissions, and complete billing and prescription records to demonstrate real-world functionality.
-
-## How to Run
-
-To run the project, first create a PostgreSQL database named hospital_db. Then execute the provided SQL files in the following order: schema file, sample data file, and views/functions/triggers file. After setup, sample queries can be executed to test and analyze the system.
-
-## Documentation
-
-For complete details of the project, including schema design, ERD, relationships, and screenshots, please refer to the file Final_HMS_Project_Report.docx included in the repository.
-
-## Learning Outcomes
-
-This project demonstrates strong understanding of relational database design, normalization, entity-relationship modeling, advanced SQL programming, and real-world system implementation.
-
-## Author
-
-Ahmad Karim
-University of Central Asia
+Author: Ahmad Karim. Maintenance fixes and documentation were prepared with AI assistance. Original report and source history are retained.

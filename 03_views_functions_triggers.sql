@@ -5,21 +5,24 @@
 
 -- full profile for patients
 CREATE OR REPLACE VIEW vw_patient_full_profile AS
-SELECT
-    p.patient_id,
+SELECT p.patient_id,
     p.first_name || ' ' || p.last_name AS full_name,
     EXTRACT(YEAR FROM AGE(CURRENT_DATE, p.date_of_birth))::INT AS age,
-    p.blood_group,
-    p.phone,
-    COUNT(DISTINCT a.appointment_id) AS total_visits,
-    MAX(a.appointment_date) AS last_visit_date,
-    COALESCE(SUM(b.total_amount), 0) AS total_billed,
-    COALESCE(SUM(b.paid_amount), 0) AS total_paid,
-    COALESCE(SUM(b.total_amount), 0) - COALESCE(SUM(b.paid_amount), 0) AS outstanding_balance
+    p.blood_group, p.phone,
+    COALESCE(a.total_visits, 0) AS total_visits,
+    a.last_visit_date,
+    COALESCE(b.total_billed, 0) AS total_billed,
+    COALESCE(b.total_paid, 0) AS total_paid,
+    COALESCE(b.total_billed, 0) - COALESCE(b.total_paid, 0) AS outstanding_balance
 FROM patients p
-LEFT JOIN appointments a ON p.patient_id = a.patient_id
-LEFT JOIN billing b ON p.patient_id = b.patient_id
-GROUP BY p.patient_id, p.first_name, p.last_name, p.date_of_birth, p.blood_group, p.phone;
+LEFT JOIN (
+    SELECT patient_id, COUNT(*) AS total_visits, MAX(appointment_date) AS last_visit_date
+    FROM appointments GROUP BY patient_id
+) a ON p.patient_id = a.patient_id
+LEFT JOIN (
+    SELECT patient_id, SUM(total_amount) AS total_billed, SUM(paid_amount) AS total_paid
+    FROM billing GROUP BY patient_id
+) b ON p.patient_id = b.patient_id;
 
 -- today's schedule for doctors
 CREATE OR REPLACE VIEW vw_doctor_schedule_today AS
@@ -158,3 +161,4 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trg_bill_total
 BEFORE INSERT OR UPDATE ON billing
 FOR EACH ROW EXECUTE FUNCTION calc_bill();
+
