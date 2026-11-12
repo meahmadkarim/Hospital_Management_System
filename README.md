@@ -33,3 +33,9 @@ The modular setup and billing regression were run successfully on PostgreSQL 18 
 There is no web interface, authentication, permission model or clinical workflow validation. Room allocation and appointment checks are educational examples, not a concurrency-safe hospital scheduling system. The sample data loads before triggers are created, preserving the original demonstration values. Bill items are not automatically reconciled with billing subtotals.
 
 Author: Ahmad Karim. Maintenance fixes and documentation were prepared with AI assistance. Original report and source history are retained.
+
+## Technology and implementation details
+
+**PostgreSQL SQL** defines relational tables, keys, checks and indexes. **PL/pgSQL** implements functions and trigger bodies. Reporting views use joins and aggregates; the repaired patient-profile view aggregates appointments and billing separately before joining, preventing multiplication of financial totals. The regression script uses a transaction and a `DO` block that raises an exception when totals differ.
+
+`psql` runs setup and regression commands. No Python, pandas, machine-learning model or web framework is required. This project supports the portfolio's data-management foundation rather than serving as an AI project.
